@@ -14,36 +14,43 @@ router = APIRouter(
 # ============================================================
 
 BASE_DIR = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))
-    )
+    os.path.dirname(os.path.abspath(__file__))
 )
 
-MODEL_PATH = os.path.join(
-    BASE_DIR,
-    "ml",
-    "saved_models",
-    "diabetes_model.pkl"
-)
+# Try multiple paths for model and dataset
+MODEL_PATHS = [
+    os.path.join(BASE_DIR, "diabetes_model.pkl"),
+    os.path.join(BASE_DIR, "..", "ml", "saved_models", "diabetes_model.pkl"),
+    os.path.join(BASE_DIR, "..", "..", "ml", "saved_models", "diabetes_model.pkl"),
+]
 
-DATA_PATH = os.path.join(
-    BASE_DIR,
-    "ml",
-    "dataset",
-    "diabetes.csv"
-)
+DATA_PATHS = [
+    os.path.join(BASE_DIR, "..", "ml", "dataset", "diabetes.csv"),
+    os.path.join(BASE_DIR, "..", "..", "ml", "dataset", "diabetes.csv"),
+]
 
 
 # ============================================================
 # LOAD MODEL
 # ============================================================
 
-try:
-    model = joblib.load(MODEL_PATH)
-    print("Diabetes model loaded successfully!")
-except Exception as e:
-    model = None
-    print("Error loading diabetes model:", e)
+model = None
+MODEL_PATH = None
+
+for path in MODEL_PATHS:
+    if os.path.exists(path):
+        MODEL_PATH = path
+        break
+
+if MODEL_PATH:
+    try:
+        model = joblib.load(MODEL_PATH)
+        print(f"Diabetes model loaded successfully from {MODEL_PATH}!")
+    except Exception as e:
+        model = None
+        print("Error loading diabetes model:", e)
+else:
+    print("Error: Diabetes model file not found in any expected location")
 
 
 # ============================================================
@@ -51,30 +58,39 @@ except Exception as e:
 # ============================================================
 
 explainer = None
+DATA_PATH = None
 
-try:
-    background_df = pd.read_csv(DATA_PATH)
+for path in DATA_PATHS:
+    if os.path.exists(path):
+        DATA_PATH = path
+        break
 
-    background_data = background_df.drop(
-        "Outcome",
-        axis=1
-    )
+if DATA_PATH:
+    try:
+        background_df = pd.read_csv(DATA_PATH)
 
-    # Use the complete dataset as SHAP background
-    masker = shap.maskers.Independent(
-        background_data,
-        max_samples=len(background_data)
-    )
+        background_data = background_df.drop(
+            "Outcome",
+            axis=1
+        )
 
-    explainer = shap.LinearExplainer(
-        model,
-        masker
-    )
+        # Use the complete dataset as SHAP background
+        masker = shap.maskers.Independent(
+            background_data,
+            max_samples=len(background_data)
+        )
 
-    print("SHAP LinearExplainer initialized successfully!")
+        explainer = shap.LinearExplainer(
+            model,
+            masker
+        )
 
-except Exception as e:
-    print("Error initializing SHAP:", e)
+        print(f"SHAP LinearExplainer initialized successfully from {DATA_PATH}!")
+
+    except Exception as e:
+        print("Error initializing SHAP:", e)
+else:
+    print("Error: Diabetes dataset file not found in any expected location")
 
 
 # ============================================================
