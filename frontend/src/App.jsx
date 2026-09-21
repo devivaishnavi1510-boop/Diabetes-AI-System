@@ -119,7 +119,7 @@ function App() {
       });
 
       const response = await fetch(
-        `http://127.0.0.1:8000/prediction/predict?${params.toString()}`,
+        `https://diabetes-ai-system-96ia.onrender.com/prediction/predict?${params.toString()}`,
         {
           method: "POST",
         }
@@ -177,7 +177,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/ai/health-insights",
+        "https://diabetes-ai-system-96ia.onrender.com/ai/health-insights",
         {
           method: "POST",
           headers: {
@@ -264,7 +264,7 @@ function App() {
       params.append("original_risk_percentage", result.risk_percentage);
 
       const response = await fetch(
-        `http://127.0.0.1:8000/prediction/simulate?${params.toString()}`,
+        `https://diabetes-ai-system-96ia.onrender.com/prediction/simulate?${params.toString()}`,
         {
           method: "POST",
         }
