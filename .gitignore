@@ -1,0 +1,27 @@
+# Secrets and local environment configuration
+.env
+.env.*
+!.env.example
+
+# Python virtual environments and generated files
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# JavaScript dependencies and build output
+node_modules/
+dist/
+build/
+
+# Local databases and runtime artifacts
+*.db
+*.sqlite
+*.sqlite3
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

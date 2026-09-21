@@ -1,0 +1,63 @@
+import os
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from routes.auth import router as auth_router
+from routes.prediction import router as prediction_router
+from routes.ai_insights import router as ai_insights_router
+
+
+# ============================================================
+# FASTAPI APPLICATION
+# ============================================================
+
+app = FastAPI(
+    title="Diabetes Prediction and Personalized Health Risk Assessment",
+    version="1.0.0"
+)
+
+
+# ============================================================
+# CORS
+# ============================================================
+
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url.rstrip("/"))
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ============================================================
+# ROUTERS
+# ============================================================
+
+app.include_router(auth_router)
+
+app.include_router(prediction_router)
+
+app.include_router(ai_insights_router)
+
+
+# ============================================================
+# ROOT
+# ============================================================
+
+@app.get("/")
+def root():
+    return {
+        "status": "success",
+        "message": "Welcome to Diabetes Prediction API 🚀"
+    }
